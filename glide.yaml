@@ -1,0 +1,4 @@
+package: github.com/slantin/np-compiler
+import:
+- package: github.com/sirupsen/logrus
+- package: gopkg.in/yaml.v2
