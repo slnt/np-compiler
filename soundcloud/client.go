@@ -4,14 +4,16 @@ type Client struct {
 	url         string
 	id          string
 	secret      string
+	password    string
 	oauth2token string
 }
 
-func NewClient(id, secret string) *Client {
+func NewClient(cfg Config) *Client {
 	c := &Client{
-		url:    "https://api.soundcloud.com",
-		id:     id,
-		secret: secret,
+		url:      "https://api.soundcloud.com",
+		id:       cfg.ClientID,
+		secret:   cfg.ClientSecret,
+		password: cfg.Password,
 	}
 
 	return c

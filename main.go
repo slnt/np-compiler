@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("Failed to get playlist data: %v", err)
 	}
 
-	client := soundcloud.NewClient(cfg.SoundCloud.ClientID, cfg.SoundCloud.ClientSecret)
+	client := soundcloud.NewClient(cfg.SoundCloud)
 	err = client.GetAuthToken()
 	if err != nil {
 		log.Fatalf("Failed to get SoundCloud auth token: %v", err)
