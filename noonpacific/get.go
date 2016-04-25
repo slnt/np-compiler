@@ -11,7 +11,7 @@ import (
 
 var client = &http.Client{
 	Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ohhhhhhh nooooooooooo
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // TODO:fixit
 	},
 }
 

@@ -12,8 +12,8 @@ type SoundCloudConfig struct {
 }
 
 // Load loads config from config/config.yaml.
-func Load() *Config {
+func Load() (*Config, error) {
 	c := Config{}
 
-	return &c
+	return &c, nil
 }
