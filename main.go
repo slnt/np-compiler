@@ -2,7 +2,8 @@ package main
 
 import (
 	"flag"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/slantin/np-compiler/config"
 	"github.com/slantin/np-compiler/convert"
