@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/slantin/np-compiler/soundcloud"
+	"gopkg.in/validator.v2"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,6 +29,11 @@ func Load() (*Config, error) {
 	}
 
 	err = yaml.Unmarshal(data, &c)
+	if err != nil {
+		return nil, err
+	}
+
+	err = validator.Validate(c)
 	if err != nil {
 		return nil, err
 	}

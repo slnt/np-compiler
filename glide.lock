@@ -1,5 +1,5 @@
-hash: 408b28b5249a3bd0791c9a665db0745f903595dbea0a63e292dbf9d7efc2451c
-updated: 2016-04-25T12:35:59.010595126-07:00
+hash: b3ca1e29c4efee44f1193ba37b1bde956a771dc8bbdc0a264421b4ab8c7cc0bd
+updated: 2016-04-25T13:07:40.828504372-07:00
 imports:
 - name: github.com/sirupsen/logrus
   version: cd7d1bbe41066b6c1f19780f895901052150a575
@@ -7,6 +7,8 @@ imports:
   version: f64b50fbea64174967a8882830d621a18ee1548e
   subpackages:
   - unix
+- name: gopkg.in/validator.v2
+  version: 3e4f037f12a1221a0864cf0dd2e81c452ab22448
 - name: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
 devImports: []
