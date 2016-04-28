@@ -21,7 +21,7 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	npPlaylist, err := noonpacific.GetPlaylist(*id)
+	npp, err := noonpacific.GetPlaylist(*id)
 	if err != nil {
 		log.Fatalf("Failed to get playlist data: %v", err)
 	}
@@ -32,12 +32,12 @@ func main() {
 		log.Fatalf("Failed to get SoundCloud auth token: %v", err)
 	}
 
-	scPlaylist, err := convert.NPtoSC(npPlaylist)
+	scp, err := convert.NPtoSC(npp)
 	if err != nil {
 		log.Fatalf("Failed to convert playlist: %v", err)
 	}
 
-	err = client.UploadPlaylist(scPlaylist)
+	err = client.UploadPlaylist(scp)
 	if err != nil {
 		log.Fatalf("Failed to upload playlist to SoundCloud: %v", err)
 	}

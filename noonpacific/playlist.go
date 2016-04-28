@@ -17,16 +17,14 @@ type Track struct {
 
 // Playlist is a Noon Pacific Playlist
 type Playlist struct {
-	Name              string  `json:"name"`
-	ID                int     `json:"id"`
-	Description       string  `json:"description"`
-	PlaylistNumber    int     `json:"playlist_number"`
-	TrackCount        int     `json:"track_count"`
-	Tracks            []Track `json:"tracks"`
-	ReleaseDate       string  `json:"release_date"`
-	DateCreated       string  `json:"date_created"`
-	CoverURL          string  `json:"cover_large"`
-	ReleaseWeekNumber int     `json:"release_week_number"`
-	ReleaseYearNumber int     `json:"release_year_number"`
-	CoverDescription  string  `json:"cover_description"`
+	Name             string  `json:"name"`
+	ID               int     `json:"id"`
+	Description      string  `json:"description"`
+	PlaylistNumber   int     `json:"playlist_number"`
+	TrackCount       int     `json:"track_count"`
+	Tracks           []Track `json:"tracks"`
+	ReleaseDate      string  `json:"release_date"`
+	DateCreated      string  `json:"date_created"`
+	CoverURL         string  `json:"cover_large"`
+	CoverDescription string  `json:"cover_description"`
 }

@@ -1,20 +1,21 @@
 package soundcloud
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"gopkg.in/validator.v2"
 )
 
 const baseURL = "https://api.soundcloud.com"
 
 type Auth struct {
-	Token   string `json:"access_token"`
-	Refresh string `json:"refresh_token"`
-	Scope   string `json:"scope"`
-	Expires int    `json:"expires_in"`
+	Token string `json:"access_token" validate:"nonzero"`
+	Scope string `json:"scope"`
 }
 
 type Client struct {
@@ -39,15 +40,15 @@ func NewClient(cfg Config) *Client {
 }
 
 func (c *Client) GetAuthToken() error {
-	query := make(url.Values)
-	query.Set("grant_type", "password")
-	query.Set("client_id", c.id)
-	query.Set("client_secret", c.secret)
-	query.Set("username", c.username)
-	query.Set("password", c.password)
-	query.Set("scope", "")
+	form := make(url.Values)
+	form.Set("grant_type", "password")
+	form.Set("client_id", c.id)
+	form.Set("client_secret", c.secret)
+	form.Set("username", c.username)
+	form.Set("password", c.password)
+	form.Set("scope", "*")
 
-	res, err := http.PostForm(fmt.Sprintf("%s/oauth2/token", c.url), query)
+	res, err := http.PostForm(fmt.Sprintf("%s/oauth2/token", c.url), form)
 	if err != nil {
 		return err
 	}
@@ -59,8 +60,11 @@ func (c *Client) GetAuthToken() error {
 	}
 
 	var auth Auth
-	err = json.Unmarshal(resBody, &auth)
-	if err != nil {
+	if err := json.Unmarshal(resBody, &auth); err != nil {
+		return err
+	}
+
+	if err := validator.Validate(auth); err != nil {
 		return err
 	}
 
@@ -69,6 +73,31 @@ func (c *Client) GetAuthToken() error {
 }
 
 func (c *Client) UploadPlaylist(playlist *Playlist) error {
+	body, err := json.Marshal(*playlist)
+	if err != nil {
+		return err
+	}
+
+	query := make(url.Values)
+	query.Set("access_token", c.auth.Token)
+	query.Set("client_id", c.id)
+	query.Set("client_secret", c.secret)
+
+	req, err := http.NewRequest("POST",
+		fmt.Sprintf("%s/playlists?%s", c.url, query.Encode()),
+		bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	// TODO: fix this shit, keep getting 401 unauthorized...
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	fmt.Println(res.Status)
 
 	return nil
 }
