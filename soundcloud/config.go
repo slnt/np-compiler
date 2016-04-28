@@ -1,8 +1,11 @@
 package soundcloud
 
 type Config struct {
-	// TODO: can I auth without storing password in plaintext? ;_;
-	Password     string `yaml:"password" validate:"nonzero"`
-	ClientID     string `yaml:"id" validate:"nonzero"`
-	ClientSecret string `yaml:"secret" validate:"nonzero"`
+	// TODO: auth without password?
+	Username string `yaml:"username" validate:"nonzero"`
+	Password string `yaml:"password" validate:"nonzero"`
+	Client   struct {
+		ID     string `yaml:"id" validate:"nonzero"`
+		Secret string `yaml:"secret" validate:"nonzero"`
+	} `yaml:"client"`
 }
