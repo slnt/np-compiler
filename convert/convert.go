@@ -1,11 +1,14 @@
 package convert
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/slantin/np-compiler/noonpacific"
 	"github.com/slantin/np-compiler/soundcloud"
 )
+
+var descriptionFmt = "http://noonpacific.com/#/mix/%d\n"
 
 func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 	var scp soundcloud.Playlist
@@ -22,6 +25,9 @@ func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 	scp.ReleaseDay = release.Day()
 	scp.ArtworkURL = npp.CoverURL
 	scp.Type = "compilation"
+	scp.Tags = "noonpacific"
+	scp.Genre = "noonpacific"
+	scp.Description = fmt.Sprintf(descriptionFmt, npp.ID)
 
 	for _, track := range npp.Tracks {
 		scp.Tracks = append(scp.Tracks, soundcloud.Track{

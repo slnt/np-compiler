@@ -1,5 +1,6 @@
 package soundcloud
 
+// Config is configuration data for the soundcloud API, retrieved from a yaml config file
 type Config struct {
 	// TODO: auth without password?
 	Username string `yaml:"username" validate:"nonzero"`
