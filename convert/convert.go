@@ -10,6 +10,7 @@ import (
 
 var descriptionFmt = "http://noonpacific.com/#/mix/%d\n"
 
+// NPtoSC takes a Noon Pacific playlist and convets it into a SoundCloud playlist
 func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 	var scp soundcloud.Playlist
 

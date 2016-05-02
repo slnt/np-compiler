@@ -24,7 +24,6 @@ var Endpoint = "https://api.colormyx.com/v1/noon-pacific/playlists/%d/?detail=tr
 // GetPlaylist hits Endpoint to get the playlist with the given ID. If no playlist
 // exists, or if the playlist name does not match NoonRegexp, returns an error.
 func GetPlaylist(id int) (*Playlist, error) {
-	var playlist Playlist
 	res, err := client.Get(fmt.Sprintf(Endpoint, id))
 	if err != nil {
 		return nil, err
@@ -36,6 +35,7 @@ func GetPlaylist(id int) (*Playlist, error) {
 		return nil, err
 	}
 
+	var playlist Playlist
 	err = json.Unmarshal(body, &playlist)
 	if err != nil {
 		return nil, err
