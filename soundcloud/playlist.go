@@ -13,8 +13,8 @@ type Playlist struct {
 	Created      string  `json:"created_at"`
 	ReleaseDay   int     `json:"release_day"`
 	ReleaseMonth int     `json:"release_month"`
-	ReleasyYear  int     `json:"release_year"`
-	ArtworkURL   string  `json:"artwork_url"`
+	ReleaseYear  int     `json:"release_year"`
+	ArtworkData  []byte  `json:"artwork_data"`
 	Type         string  `json:"playlist_type"`
 	Genre        string  `json:"genre"`
 	Description  string  `json:"description"`

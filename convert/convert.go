@@ -14,24 +14,33 @@ var scTimeFmt = "2006/01/02 15:04:05 -0700"
 
 // NPtoSC takes a Noon Pacific playlist and convets it into a SoundCloud playlist
 func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
-	var scp soundcloud.Playlist
-
 	release, err := time.ParseInLocation(time.RFC3339, npp.ReleaseDate, time.FixedZone("PDT", 0))
 	if err != nil {
 		return nil, err
 	}
 
-	scp.Title = npp.Name
-	scp.Sharing = "public"
-	scp.Created = release.Format(scTimeFmt)
-	scp.ReleasyYear = release.Year()
-	scp.ReleaseMonth = int(release.Month())
-	scp.ReleaseDay = release.Day()
-	scp.ArtworkURL = npp.CoverURL
-	scp.Type = "compilation"
-	scp.Tags = "noonpacific"
-	scp.Genre = "noonpacific"
-	scp.Description = fmt.Sprintf(descriptionFmt, npp.ID)
+	artwork, err := getArtwork(npp)
+	if err != nil {
+		return nil, err
+	}
+
+	// if err := saveArtwork(npp.ID, artwork); err != nil {
+	// 	return nil, err
+	// }
+
+	scp := &soundcloud.Playlist{
+		Title:        npp.Name,
+		Sharing:      "private",
+		Created:      release.Format(scTimeFmt),
+		ReleaseYear:  release.Year(),
+		ReleaseMonth: int(release.Month()),
+		ReleaseDay:   release.Day(),
+		// ArtworkData:  artwork, 	TODO: Fix somehow?
+		Type:        "compilation",
+		Tags:        "noonpacific",
+		Genre:       "noonpacific",
+		Description: fmt.Sprintf(descriptionFmt, npp.ID),
+	}
 
 	for _, track := range npp.Tracks {
 		scp.Tracks = append(scp.Tracks, soundcloud.Track{
@@ -39,5 +48,5 @@ func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 		})
 	}
 
-	return &scp, nil
+	return scp, nil
 }
