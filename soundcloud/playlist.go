@@ -10,6 +10,7 @@ type Playlist struct {
 	Title        string  `json:"title"`
 	Sharing      string  `json:"sharing"`
 	Tracks       []Track `json:"tracks"`
+	Created      string  `json:"created_at"`
 	ReleaseDay   int     `json:"release_day"`
 	ReleaseMonth int     `json:"release_month"`
 	ReleasyYear  int     `json:"release_year"`

@@ -41,4 +41,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to upload playlist to SoundCloud: %v", err)
 	}
+
+	log.Info("Successfully created playlist!")
 }

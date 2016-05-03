@@ -104,7 +104,9 @@ func (c *Client) UploadPlaylist(playlist *Playlist) error {
 	if err != nil {
 		return err
 	}
-	req.Header.Add("ACCEPT", "application/json")
+	req.Header.Add("Content-Length", string(len(body)))
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
 
 	// TODO: fix this shit v2, keep getting 422 unprocessable entity
 	res, err := http.DefaultClient.Do(req)
@@ -118,7 +120,7 @@ func (c *Client) UploadPlaylist(playlist *Playlist) error {
 		return err
 	}
 
-	if res.StatusCode != http.StatusOK {
+	if res.StatusCode != http.StatusCreated {
 		log.WithFields(log.Fields{
 			"status": res.Status,
 			"body":   string(resBody),

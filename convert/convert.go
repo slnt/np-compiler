@@ -10,6 +10,8 @@ import (
 
 var descriptionFmt = "http://noonpacific.com/#/mix/%d\n"
 
+var scTimeFmt = "2006/01/02 15:04:05 -0700"
+
 // NPtoSC takes a Noon Pacific playlist and convets it into a SoundCloud playlist
 func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 	var scp soundcloud.Playlist
@@ -21,6 +23,7 @@ func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 
 	scp.Title = npp.Name
 	scp.Sharing = "public"
+	scp.Created = release.Format(scTimeFmt)
 	scp.ReleasyYear = release.Year()
 	scp.ReleaseMonth = int(release.Month())
 	scp.ReleaseDay = release.Day()
