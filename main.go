@@ -26,6 +26,11 @@ func main() {
 		log.Fatalf("Failed to get playlist data: %v", err)
 	}
 
+	_, err = npp.GetArtwork(false)
+	if err != nil {
+		log.Fatalf("Failed to get playlist artwork: %v", err)
+	}
+
 	client := soundcloud.NewClient(cfg.SoundCloud)
 	err = client.GetAuthToken()
 	if err != nil {

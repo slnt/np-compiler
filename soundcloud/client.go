@@ -108,7 +108,6 @@ func (c *Client) UploadPlaylist(playlist *Playlist) error {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
 
-	// TODO: fix this shit v2, keep getting 422 unprocessable entity
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
@@ -128,5 +127,10 @@ func (c *Client) UploadPlaylist(playlist *Playlist) error {
 		return fmt.Errorf("Failed to do request, got: %s", res.Status)
 	}
 
+	return nil
+}
+
+// UploadArtwork uploads the given artwork to the specified playlist
+func (c *Client) UploadArtwork(playlist *Playlist, artwork []byte) error {
 	return nil
 }

@@ -19,15 +19,6 @@ func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 		return nil, err
 	}
 
-	artwork, err := getArtwork(npp)
-	if err != nil {
-		return nil, err
-	}
-
-	// if err := saveArtwork(npp.ID, artwork); err != nil {
-	// 	return nil, err
-	// }
-
 	scp := &soundcloud.Playlist{
 		Title:        npp.Name,
 		Sharing:      "private",
@@ -35,11 +26,10 @@ func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 		ReleaseYear:  release.Year(),
 		ReleaseMonth: int(release.Month()),
 		ReleaseDay:   release.Day(),
-		// ArtworkData:  artwork, 	TODO: Fix somehow?
-		Type:        "compilation",
-		Tags:        "noonpacific",
-		Genre:       "noonpacific",
-		Description: fmt.Sprintf(descriptionFmt, npp.ID),
+		Type:         "compilation",
+		Tags:         "noonpacific",
+		Genre:        "noonpacific",
+		Description:  fmt.Sprintf(descriptionFmt, npp.ID),
 	}
 
 	for _, track := range npp.Tracks {
