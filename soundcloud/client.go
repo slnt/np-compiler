@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -82,25 +83,83 @@ type wrappedPlaylist struct {
 	Playlist *Playlist `json:"playlist"`
 }
 
+func (c *Client) newRequest(method, endpoint, format string, body io.Reader) (*http.Request, error) {
+	query := make(url.Values)
+	query.Set("format", format)
+	query.Set("oauth_token", c.auth.Token)
+	query.Set("client_id", c.id)
+
+	return http.NewRequest(method,
+		fmt.Sprintf("%s%s?%s", c.url, endpoint, query.Encode()),
+		body)
+}
+
 func wrapPlaylist(playlist *Playlist) *wrappedPlaylist {
 	return &wrappedPlaylist{Playlist: playlist}
 }
 
 // UploadPlaylist takes the given playlist and tries to upload it using the client credentials
-func (c *Client) UploadPlaylist(playlist *Playlist) error {
+func (c *Client) UploadPlaylist(playlist *Playlist) (*Playlist, error) {
 	body, err := json.Marshal(wrapPlaylist(playlist))
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.newRequest("POST", "/playlists", "json", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Length", string(len(body)))
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	resBody, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusCreated {
+		log.WithFields(log.Fields{
+			"status": res.Status,
+			"body":   string(resBody),
+		}).Error("Request failed")
+		return nil, fmt.Errorf("Failed to do request, got: %s", res.Status)
+	}
+
+	var rp Playlist
+	err = json.Unmarshal(resBody, &rp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rp, nil
+}
+
+type artworkRequest struct {
+	Playlist struct {
+		ID          int    `json:"id"`
+		ArtworkData []byte `json:"artwork_data"`
+	} `json:"playlist"`
+}
+
+// UploadArtwork uploads the given artwork to the specified playlist
+func (c *Client) UploadArtwork(playlistID int, artwork []byte) error {
+	var areq artworkRequest
+	areq.Playlist.ID = playlistID
+	areq.Playlist.ArtworkData = artwork
+
+	body, err := json.Marshal(&areq)
 	if err != nil {
 		return err
 	}
 
-	query := make(url.Values)
-	query.Set("format", "json")
-	query.Set("oauth_token", c.auth.Token)
-	query.Set("client_id", c.id)
-
-	req, err := http.NewRequest("POST",
-		fmt.Sprintf("%s/playlists?%s", c.url, query.Encode()),
-		bytes.NewReader(body))
+	req, err := c.newRequest("PUT", "/playlists", "json", bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -112,25 +171,25 @@ func (c *Client) UploadPlaylist(playlist *Playlist) error {
 	if err != nil {
 		return err
 	}
-	defer res.Body.Close()
 
-	resBody, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-
-	if res.StatusCode != http.StatusCreated {
+	if !(res.StatusCode >= 200 && res.StatusCode < 300) {
 		log.WithFields(log.Fields{
 			"status": res.Status,
-			"body":   string(resBody),
-		}).Error("Request failed")
+			// "body":   string(rgesBody),
+		}).Error("Failed to upload artwork")
 		return fmt.Errorf("Failed to do request, got: %s", res.Status)
 	}
 
-	return nil
-}
+	// resBody, err := ioutil.ReadAll(res.Body)
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// var rp Playlist
+	// err = json.Unmarshal(resBody, &rp)
+	// if err != nil {
+	// 	return err
+	// }
 
-// UploadArtwork uploads the given artwork to the specified playlist
-func (c *Client) UploadArtwork(playlist *Playlist, artwork []byte) error {
 	return nil
 }

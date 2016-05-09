@@ -4,14 +4,16 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/slantin/np-compiler/soundcloud"
 	"gopkg.in/validator.v2"
 	"gopkg.in/yaml.v2"
+
+	"github.com/slantin/np-compiler/soundcloud"
 )
 
 // Config is the aplication's configuration
 type Config struct {
-	SoundCloud soundcloud.Config `yaml:"soundcloud"`
+	SaveArtwork bool              `yaml:"saveArtwork"`
+	SoundCloud  soundcloud.Config `yaml:"soundcloud"`
 }
 
 // Load loads config from config/config.yaml.

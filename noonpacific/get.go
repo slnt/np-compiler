@@ -55,8 +55,7 @@ func (npp *Playlist) GetArtwork(save bool) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO: :?
-	// req.Header.Add("Accept", "image/jpeg")
+	req.Header.Add("Accept", "image/jpeg")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
