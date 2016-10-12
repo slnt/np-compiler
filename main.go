@@ -1,34 +1,29 @@
 package main
 
 import (
-	"flag"
-
 	log "github.com/sirupsen/logrus"
 
 	"github.com/slantin/np-compiler/config"
 	"github.com/slantin/np-compiler/convert"
 	"github.com/slantin/np-compiler/noonpacific"
+	"github.com/slantin/np-compiler/print"
 	"github.com/slantin/np-compiler/soundcloud"
 )
 
-var id = flag.Int("id", 1, "ID of playlist to upload")
-
 func main() {
-	flag.Parse()
-
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
-	}
+	cfg := config.Get()
+	noonpacific.Init(cfg.NoonPacific.ClientID)
 
 	log.Info("Getting NoonPacific playlist data")
-	npp, err := noonpacific.GetPlaylist(*id)
+	mixtape, err := noonpacific.LatestMixtape()
 	if err != nil {
-		log.Fatalf("Failed to get playlist data: %v", err)
+		log.Fatalf("Failed to get mixtape data: %v", err)
 	}
+	print.JSON(mixtape)
 
 	log.Info("Getting playlist artwork")
-	artwork, err := npp.GetArtwork(cfg.SaveArtwork)
+	// artwork, err := mixtape.GetArtwork(cfg.SaveArtwork)
+	_, err = mixtape.GetArtwork(cfg.SaveArtwork)
 	if err != nil {
 		log.Fatalf("Failed to get playlist artwork: %v", err)
 	}
@@ -41,14 +36,14 @@ func main() {
 	}
 
 	log.Info("Converting playlist")
-	scp, err := convert.NPtoSC(npp)
+	playlist, err := convert.NPtoSC(mixtape)
 	if err != nil {
 		log.Fatalf("Failed to convert playlist: %v", err)
 	}
-	scp.ArtworkData = artwork
+	// playlist.ArtworkData = artwork
 
 	log.Info("Uploading playlist to SoundCloud")
-	res, err := client.UploadPlaylist(scp)
+	res, err := client.UploadPlaylist(playlist)
 	if err != nil {
 		log.Fatalf("Failed to upload playlist to SoundCloud: %v", err)
 	}

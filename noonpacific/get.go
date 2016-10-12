@@ -1,7 +1,6 @@
 package noonpacific
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,48 +9,102 @@ import (
 	"regexp"
 )
 
-var client = &http.Client{
-	Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // TODO:fixit
-	},
-}
-
 // NoonRegexp is the regular expressions for the title of Noon Pacific playlists
 var NoonRegexp = regexp.MustCompile(`^NOON \/\/ \d+$`)
 
-// Endpoint is the http API endpoint to get Noon Pacific track data
-var Endpoint = "https://api.colormyx.com/v1/noon-pacific/playlists/%d/?detail=true"
+// API is the api URL for the noonpacific api
+var API = "https://beta.whitelabel.cool/api"
 
-// GetPlaylist hits Endpoint to get the playlist with the given ID. If no playlist
-// exists, or if the playlist name does not match NoonRegexp, returns an error.
-func GetPlaylist(id int) (*Playlist, error) {
-	res, err := client.Get(fmt.Sprintf(Endpoint, id))
+// ClientID is the magical client id gleaned from the api calls made by noonpacific.com
+var ClientID string
+
+var client = http.DefaultClient
+
+// Init sets the clientID for requests
+func Init(clientID string) {
+	ClientID = clientID
+}
+
+// NewRequest creates a new http request to the given endpoint for the noonpacific api
+func NewRequest(endpoint string) (*http.Request, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s", API, endpoint), nil)
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Set("Client", ClientID)
+
+	return req, err
+}
+
+// LatestMixtape gets the latest noonpacific mixtape and returns it
+func LatestMixtape() (*Mixtape, error) {
+	req, err := NewRequest("/mixtapes/")
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.Do(req)
 	defer res.Body.Close()
+	if err != nil {
+		return nil, err
+	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	var playlist Playlist
-	err = json.Unmarshal(body, &playlist)
+	var mixtapes Mixtapes
+	err = json.Unmarshal(body, &mixtapes)
 	if err != nil {
 		return nil, err
 	}
-
-	if !NoonRegexp.MatchString(playlist.Name) {
-		return nil, fmt.Errorf("Invalid playlist name: %v", playlist.Name)
+	if len(mixtapes.List) < 0 {
+		return nil, fmt.Errorf("")
 	}
 
-	return &playlist, nil
+	mixtape := &mixtapes.List[0]
+	if !NoonRegexp.MatchString(mixtape.Title) {
+		return nil, fmt.Errorf("Invalid mixtape title: %s", mixtape.Title)
+	}
+
+	if err = mixtape.getTracklist(); err != nil {
+		return nil, err
+	}
+
+	return mixtape, nil
+}
+
+func (m *Mixtape) getTracklist() error {
+	req, err := NewRequest(fmt.Sprintf("/tracks/?mixtape=%s", m.Slug))
+	if err != nil {
+		return err
+	}
+
+	res, err := client.Do(req)
+	defer res.Body.Close()
+	if err != nil {
+		return err
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	var tracklist Tracklist
+	if err = json.Unmarshal(body, &tracklist); err != nil {
+		return err
+	}
+
+	m.Tracks = tracklist.Tracks
+
+	return nil
 }
 
 // GetArtwork tries to get the binary data of the playlists cover
-func (npp *Playlist) GetArtwork(save bool) ([]byte, error) {
-	req, err := http.NewRequest("GET", npp.CoverURL, nil)
+func (m *Mixtape) GetArtwork(save bool) ([]byte, error) {
+	req, err := http.NewRequest("GET", m.ArtworkURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +122,7 @@ func (npp *Playlist) GetArtwork(save bool) ([]byte, error) {
 	}
 
 	if save {
-		saveArtwork(npp.ID, bytes)
+		saveArtwork(m.ID, bytes)
 	}
 
 	return bytes, nil

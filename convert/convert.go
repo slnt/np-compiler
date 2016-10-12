@@ -9,19 +9,19 @@ import (
 )
 
 var (
-	descriptionFmt = "http://noonpacific.com/#/mix/%d\n"
+	descriptionFmt = "http://noonpacific.com/#/mix/%s\n"
 	scTimeFmt      = "2006/01/02 15:04:05 -0700"
 )
 
 // NPtoSC takes a Noon Pacific playlist and convets it into a SoundCloud playlist
-func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
-	release, err := time.ParseInLocation(time.RFC3339, npp.ReleaseDate, time.FixedZone("PDT", 0))
+func NPtoSC(m *noonpacific.Mixtape) (*soundcloud.Playlist, error) {
+	release, err := time.ParseInLocation(time.RFC3339, m.ReleaseTime, time.FixedZone("PDT", 0))
 	if err != nil {
 		return nil, err
 	}
 
 	scp := &soundcloud.Playlist{
-		Title:        npp.Name,
+		Title:        m.Title,
 		Sharing:      "public",
 		Created:      release.Format(scTimeFmt),
 		ReleaseYear:  release.Year(),
@@ -30,13 +30,11 @@ func NPtoSC(npp *noonpacific.Playlist) (*soundcloud.Playlist, error) {
 		Type:         "compilation",
 		Tags:         "noonpacific",
 		Genre:        "noonpacific",
-		Description:  fmt.Sprintf(descriptionFmt, npp.ID),
+		Description:  fmt.Sprintf(descriptionFmt, m.Title),
 	}
 
-	for _, track := range npp.Tracks {
-		scp.Tracks = append(scp.Tracks, soundcloud.Track{
-			ID: track.SoundCloudID,
-		})
+	for _, track := range m.Tracks {
+		scp.Tracks = append(scp.Tracks, soundcloud.Track{ID: track.ID})
 	}
 
 	return scp, nil

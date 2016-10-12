@@ -7,17 +7,33 @@ import (
 	"gopkg.in/validator.v2"
 	"gopkg.in/yaml.v2"
 
+	"github.com/slantin/np-compiler/noonpacific"
 	"github.com/slantin/np-compiler/soundcloud"
 )
 
-// Config is the aplication's configuration
-type Config struct {
-	SaveArtwork bool              `yaml:"saveArtwork"`
-	SoundCloud  soundcloud.Config `yaml:"soundcloud"`
+var config *Config
+
+func init() {
+	cfg, err := load()
+	if err != nil {
+		panic(err)
+	}
+	config = cfg
 }
 
-// Load loads config from config/config.yaml.
-func Load() (*Config, error) {
+// Get returns the config that was loaded from config/config.yaml
+func Get() *Config {
+	return config
+}
+
+// Config is the aplication's configuration
+type Config struct {
+	SaveArtwork bool               `yaml:"save_artwork"`
+	SoundCloud  soundcloud.Config  `yaml:"soundcloud"`
+	NoonPacific noonpacific.Config `yaml:"noonpacific"`
+}
+
+func load() (*Config, error) {
 	c := Config{}
 
 	file, err := os.Open("./config/config.yaml")
