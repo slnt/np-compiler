@@ -30,7 +30,7 @@ func NPtoSC(m *noonpacific.Mixtape) (*soundcloud.Playlist, error) {
 		Type:         "compilation",
 		Tags:         "noonpacific",
 		Genre:        "noonpacific",
-		Description:  fmt.Sprintf(descriptionFmt, m.Title),
+		Description:  fmt.Sprintf(descriptionFmt, m.Slug),
 	}
 
 	for _, track := range m.Tracks {

@@ -6,7 +6,6 @@ import (
 	"github.com/slantin/np-compiler/config"
 	"github.com/slantin/np-compiler/convert"
 	"github.com/slantin/np-compiler/noonpacific"
-	"github.com/slantin/np-compiler/print"
 	"github.com/slantin/np-compiler/soundcloud"
 )
 
@@ -19,7 +18,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to get mixtape data: %v", err)
 	}
-	print.JSON(mixtape)
 
 	log.Info("Getting playlist artwork")
 	// artwork, err := mixtape.GetArtwork(cfg.SaveArtwork)
