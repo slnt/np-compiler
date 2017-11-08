@@ -1,4 +1,4 @@
-### This project is no deprecated. The API used no longer exists and NoonPacific now exclusively posts playlists on Spotify.
+### This project is now deprecated. The API used no longer exists and NoonPacific now exclusively posts playlists on Spotify.
 
 # Noon Pacific Compiler
 
